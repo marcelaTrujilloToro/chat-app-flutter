@@ -1,3 +1,5 @@
+export 'package:chat_app/widgets/chat_message.dart';
+
 export 'package:chat_app/widgets/btn_blue.dart';
 
 export 'package:chat_app/widgets/labels.dart';
