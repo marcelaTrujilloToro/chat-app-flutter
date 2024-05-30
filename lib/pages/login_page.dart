@@ -1,5 +1,10 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:chat_app/helpers/show_alert.dart';
+import 'package:chat_app/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:chat_app/widgets/custom_widgets.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -51,6 +56,8 @@ class __FormState extends State<_Form> {
 
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
+
     return Container(
       margin: const EdgeInsets.only(top: 40),
       padding: const EdgeInsets.symmetric(horizontal: 50),
@@ -70,10 +77,26 @@ class __FormState extends State<_Form> {
           ),
           BtnBlue(
             label: 'Log-in',
-            onPressed: () {
-              print(emailController.text);
-              print(passController.text);
-            },
+            onPressed: authService.authenticating
+                ? null
+                : () async {
+                    FocusScope.of(context).unfocus();
+
+                    final loginOk = await authService.login(
+                      emailController.text.trim(),
+                      passController.text.trim(),
+                    );
+
+                    if (loginOk) {
+                      Navigator.pushReplacementNamed(context, 'users');
+                    } else {
+                      showAlert(
+                        context: context,
+                        title: 'Login incorrecto',
+                        subtitle: 'Revise sus credenciales',
+                      );
+                    }
+                  },
           )
         ],
       ),

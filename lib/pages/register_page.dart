@@ -1,5 +1,10 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:chat_app/helpers/show_alert.dart';
+import 'package:chat_app/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:chat_app/widgets/custom_widgets.dart';
+import 'package:provider/provider.dart';
 
 class RegisterPage extends StatelessWidget {
   const RegisterPage({super.key});
@@ -52,6 +57,8 @@ class __FormState extends State<_Form> {
 
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
+
     return Container(
       margin: const EdgeInsets.only(top: 40),
       padding: const EdgeInsets.symmetric(horizontal: 50),
@@ -76,11 +83,23 @@ class __FormState extends State<_Form> {
           ),
           BtnBlue(
             label: 'Register',
-            onPressed: () {
-              print(emailController.text);
-              print(passController.text);
-              print(nameController.text);
-            },
+            onPressed: authService.authenticating
+                ? null
+                : () async {
+                    final registerOk = await authService.register(
+                        emailController.text.trim(),
+                        passController.text.trim(),
+                        nameController.text.trim());
+
+                    if (registerOk == true) {
+                      Navigator.pushReplacementNamed(context, 'users');
+                    } else {
+                      showAlert(
+                          context: context,
+                          title: 'Registro incorrecto ',
+                          subtitle: registerOk);
+                    }
+                  },
           )
         ],
       ),
