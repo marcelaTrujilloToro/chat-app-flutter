@@ -92,6 +92,7 @@ class AuthService with ChangeNotifier {
     final token = await _storage.read(key: 'token') ?? '';
 
     final uri = Uri.parse('${Environments.apiUrl}/login/renew');
+
     final resp = await http.get(uri,
         headers: {'Content-Type': 'application/json', 'x-token': token});
 
@@ -99,6 +100,7 @@ class AuthService with ChangeNotifier {
       final loginResponse = loginResponseFromJson(resp.body);
       user = loginResponse.user;
       await _saveToken(loginResponse.token);
+
       return true;
     } else {
       logout();

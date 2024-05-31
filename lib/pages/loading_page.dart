@@ -3,6 +3,7 @@
 import 'package:chat_app/pages/login_page.dart';
 import 'package:chat_app/pages/users_page.dart';
 import 'package:chat_app/services/auth_service.dart';
+import 'package:chat_app/services/socket_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -24,11 +25,14 @@ class LoadingPage extends StatelessWidget {
   }
 
   Future checkLoginState(BuildContext context) async {
-    final authService = Provider.of<AuthService>(context, listen: false);
+    final authService = Provider.of<AuthService>(context);
+    final socketService = Provider.of<SocketService>(context);
 
     final authenticated = await authService.isLoggedIn();
 
     if (authenticated) {
+      socketService.connect();
+
       // Navigator.pushReplacementNamed(context, 'users');
       Navigator.pushReplacement(
         context,
@@ -37,6 +41,8 @@ class LoadingPage extends StatelessWidget {
             pageBuilder: (_, __, ___) => const UsersPage()),
       );
     } else {
+      socketService.disconnect();
+
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(
